@@ -74,10 +74,29 @@ document.addEventListener('DOMContentLoaded', function () {
      * @param {number} aqi - Air Quality Index (1-5)
      */
     function setAqiIndicatorPosition(aqi) {
-        // Values 1-5 correspond to positions 20%, 40%, 60%, 80%, 100%
-        const positions = [null, 12.5, 37.5, 62.5, 87.5, 100];
+        // Values 1-5 correspond to positions 12.5%, 37.5%, 62.5%, 87.5%, 95%
+        const positions = [null, 12.5, 37.5, 62.5, 87.5, 95];
         const position = positions[aqi] || 12.5; // Default to good if invalid
         aqiIndicator.style.left = `${position}%`;
+    }
+
+    /**
+     * Show loading state
+     */
+    function showLoading() {
+        cityInput.disabled = true;
+        searchButton.disabled = true;
+        searchButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        errorMessage.style.display = 'none';
+    }
+
+    /**
+     * Reset loading state
+     */
+    function resetLoading() {
+        cityInput.disabled = false;
+        searchButton.disabled = false;
+        searchButton.innerHTML = 'Search';
     }
 
     /**
@@ -86,11 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     async function getWeather(city) {
         try {
-            // Show loading state
-            errorMessage.style.display = 'none';
-            cityInput.disabled = true;
-            searchButton.disabled = true;
-            searchButton.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading...';
+            showLoading();
 
             // Fetch weather data
             const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);
@@ -113,8 +128,8 @@ document.addEventListener('DOMContentLoaded', function () {
             weatherIcon.alt = data.weather.description;
             
             temperature.textContent = `${Math.round(data.temperature.current)}°C`;
-            feelsLike.textContent = `Feels like: ${Math.round(data.temperature.feels_like)}°C`;
-            minMax.textContent = `Min: ${Math.round(data.temperature.min)}°C / Max: ${Math.round(data.temperature.max)}°C`;
+            feelsLike.textContent = `${Math.round(data.temperature.feels_like)}°C`;
+            minMax.textContent = `${Math.round(data.temperature.min)}°C / ${Math.round(data.temperature.max)}°C`;
             humidity.textContent = `${data.humidity}%`;
             pressure.textContent = `${data.pressure} hPa`;
             wind.textContent = `${data.wind.speed} m/s`;
@@ -135,10 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
             errorMessage.style.display = 'block';
             weatherInfo.style.display = 'none';
         } finally {
-            // Reset UI state
-            cityInput.disabled = false;
-            searchButton.disabled = false;
-            searchButton.innerHTML = '<i class="fas fa-search"></i> Search';
+            resetLoading();
         }
     }
 
@@ -164,10 +176,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Update pollutant data
             if (data.components) {
-                pm25.textContent = `${data.components.pm2_5.toFixed(1)} μg/m³`;
-                pm10.textContent = `${data.components.pm10.toFixed(1)} μg/m³`;
-                o3.textContent = `${data.components.o3.toFixed(1)} μg/m³`;
-                no2.textContent = `${data.components.no2.toFixed(1)} μg/m³`;
+                pm25.textContent = `${data.components.pm2_5.toFixed(1)} µg/m³`;
+                pm10.textContent = `${data.components.pm10.toFixed(1)} µg/m³`;
+                o3.textContent = `${data.components.o3.toFixed(1)} µg/m³`;
+                no2.textContent = `${data.components.no2.toFixed(1)} µg/m³`;
             }
 
         } catch (error) {

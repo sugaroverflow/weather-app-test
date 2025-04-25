@@ -1,13 +1,13 @@
 # Weather Dashboard
 
-A modern weather application built with Flask that provides real-time weather conditions and air quality data for cities worldwide, with a responsive and intuitive UI styled with GitLab's design elements.
+A weather application built with Flask and Tailwind CSS that provides real-time weather conditions and air quality data for cities worldwide, with a responsive and professional UI styled with GitLab's design elements.
 
 ## ✨ Features
 
 - **Real-time Weather Data**: Current temperature, feels like, min/max, humidity, pressure, and wind details
 - **Air Quality Information**: Air Quality Index (AQI) with description and pollutant levels (PM2.5, PM10, O₃, NO₂)
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **GitLab-inspired UI**: Modern interface featuring GitLab's color palette and design patterns
+- **Modern UI with Tailwind CSS**: Professional, polished interface with responsive design
+- **GitLab-inspired Design**: Using GitLab's color palette and design patterns
 - **Secure API Implementation**: Protected against SSRF attacks and other security vulnerabilities
 - **PEP 8 Compliant**: Following Python best practices for code style
 
@@ -17,12 +17,10 @@ A modern weather application built with Flask that provides real-time weather co
 weather-dashboard/
 ├── app.py                  # Main Flask application
 ├── static/                 # Static files directory
-│   ├── css/                # CSS stylesheets
-│   │   └── styles.css      # Main stylesheet
-│   └── js/                 # JavaScript files
-│       └── weather.js      # Weather data handling script
+│   ├── js/                 # JavaScript files
+│   │   └── weather.js      # Weather data handling script
 ├── templates/              # HTML templates
-│   └── index.html          # Frontend interface
+│   └── index.html          # Frontend interface with Tailwind CSS
 ├── test_app.py             # Unit tests
 ├── .env                    # Environment variables (not in repo)
 ├── requirements.txt        # Python dependencies
@@ -46,10 +44,10 @@ weather-dashboard/
 2. Create a virtual environment:
    ```bash
    python -m venv venv
-   
+
    # On Windows:
    venv\Scripts\activate
-   
+
    # On macOS/Linux:
    source venv/bin/activate
    ```
@@ -109,6 +107,25 @@ Run the test suite with:
 ```bash
 python -m unittest test_app.py
 ```
+
+## 📝 Frontend Implementation
+
+### Tailwind CSS
+This project uses Tailwind CSS via CDN for the frontend styling, providing:
+
+- **Utility-first CSS**: Fast, efficient styling with pre-built utility classes
+- **Responsive Design**: Mobile-friendly layout using responsive utilities
+- **Custom Theme**: Extended theme with GitLab color palette
+- **Modern UI Components**: Professional cards, inputs, and interactive elements
+- **Small Footprint**: No need to download or install additional CSS libraries
+
+### JavaScript
+The frontend JavaScript handles:
+
+- Fetching and displaying weather data
+- Managing loading states and error handling
+- Interactive UI elements like the air quality meter
+- Responsive data formatting
 
 ---
 ## 🚀 Demo prompts
