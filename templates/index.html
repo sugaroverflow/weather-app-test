@@ -5,492 +5,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Dashboard</title>
-    <style>
-        :root {
-            /* GitLab Colors */
-            --primary-color: #6e49cb;
-            /* GitLab purple */
-            --secondary-color: #5843af;
-            /* darker purple */
-            --accent-color: #fc6d26;
-            /* GitLab orange */
-            --light-bg: #fafafa;
-            --dark-bg: #2e2e2e;
-            --success-color: #108548;
-            /* GitLab green */
-            --text-light: #fafafa;
-            --text-dark: #333;
-            --border-color: #e5e5e5;
-            --shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-            --card-shadow: 0 4px 12px rgba(31, 33, 36, 0.1);
-            --border-radius: 4px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-            /* GitLab font stack */
-            line-height: 1.5;
-            color: var(--text-dark);
-            background: var(--light-bg);
-            min-height: 100vh;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 1rem;
-        }
-
-        .search-card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 2rem;
-            transition: transform 0.2s ease;
-            border: 1px solid var(--border-color);
-        }
-
-        .search-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .search-card h2 {
-            margin-bottom: 1rem;
-            color: var(--dark-bg);
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .search-box input {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ced4da;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
-        }
-
-        .search-box button {
-            padding: 0.75rem 1.5rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-        }
-
-        .search-box button:hover {
-            background-color: var(--secondary-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
-        }
-
-        .search-box button:active {
-            transform: translateY(1px);
-        }
-
-        .error-message {
-            color: var(--accent-color);
-            margin-top: 0.75rem;
-            display: none;
-        }
-
-        .weather-card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--card-shadow);
-            display: none;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid var(--border-color);
-        }
-
-        .weather-card h2 {
-            margin-bottom: 0.5rem;
-            font-size: 1.8rem;
-            color: var(--dark-bg);
-        }
-
-        .weather-card .location-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            color: #6c757d;
-        }
-
-        .location-info i {
-            margin-right: 0.5rem;
-        }
-
-        .weather-main {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .temp-display {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-right: 1.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .weather-icon {
-            width: 80px;
-            height: 80px;
-            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
-        }
-
-        .weather-description {
-            font-size: 1.2rem;
-            font-weight: 500;
-            text-transform: capitalize;
-        }
-
-        .weather-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .detail-box {
-            background-color: var(--light-bg);
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-
-        .detail-box:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--card-shadow);
-            border-color: #ccc;
-        }
-
-        .detail-box h4 {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #666;
-        }
-
-        .detail-box p {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .bg-pattern {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 150px;
-            height: 150px;
-            opacity: 0.15;
-            background-size: cover;
-            z-index: 0;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .weather-details {
-                grid-template-columns: 1fr;
-            }
-
-            .temp-display {
-                font-size: 2.5rem;
-            }
-
-            .weather-icon {
-                width: 60px;
-                height: 60px;
-            }
-        }
-
-        .air-quality-box {
-            border-left: 3px solid var(--primary-color);
-        }
-
-        .quality-label {
-            font-size: 0.8rem;
-            margin-top: 0.25rem;
-            display: block;
-            font-weight: 500;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        .quality-good {
-            background-color: rgba(16, 133, 72, 0.2);
-            color: #108548;
-        }
-
-        .quality-moderate {
-            background-color: rgba(217, 169, 0, 0.2);
-            color: #9e6700;
-        }
-
-        .quality-poor {
-            background-color: rgba(252, 109, 38, 0.2);
-            color: #c24400;
-        }
-
-        .quality-unhealthy {
-            background-color: rgba(203, 36, 49, 0.2);
-            color: #ae1f2c;
-        }
-
-        .quality-hazardous {
-            background-color: rgba(134, 31, 65, 0.2);
-            color: #89115a;
-        }
-    </style>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Weather Dashboard</h1>
-            <p>Get real-time weather information for any city</p>
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-branding">
+                <i class="fas fa-cloud-sun header-logo"></i>
+                <div>
+                    <h1>Weather Dashboard</h1>
+                    <p>Real-time weather information worldwide</p>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <ul>
+                    <li><a href="#" title="Home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="https://openweathermap.org/api" target="_blank" title="API Documentation"><i class="fas fa-code"></i> API Docs</a></li>
+                    <li><a href="https://gitlab.com/gitlab-da/sugaroverflow/weather-app" target="_blank" title="GitLab Repository"><i class="fab fa-gitlab"></i> Repository</a></li>
+                </ul>
+            </nav>
         </div>
+    </header>
 
-        <div class="search-card">
-            <h2>Search for a city</h2>
-            <div class="search-box">
-                <input type="text" id="city-input" placeholder="Enter city name" autocomplete="off">
-                <button id="search-button">Search</button>
+    <main class="main-content">
+        <section class="search-section">
+            <div class="search-card">
+                <h2><i class="fas fa-search"></i> Find Weather</h2>
+                <div class="search-box">
+                    <input type="text" id="city-input" placeholder="Enter city name (e.g., London, New York, Tokyo)" autocomplete="off">
+                    <button id="search-button"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <p class="error-message" id="error-message"></p>
             </div>
-            <p class="error-message" id="error-message"></p>
+        </section>
+
+        <section class="weather-section" id="weather-info">
+            <div class="weather-header">
+                <div class="location-info">
+                    <h2 id="city-name">City Name</h2>
+                    <span id="country-name">Country</span>
+                </div>
+                <div class="weather-time">
+                    <span id="current-date">Date</span>
+                    <span id="current-time">Time</span>
+                </div>
+            </div>
+
+            <div class="weather-panels">
+                <div class="main-panel">
+                    <div class="current-weather">
+                        <div class="temperature-display">
+                            <div class="temp-wrapper">
+                                <span id="temperature" class="temp-value">0°C</span>
+                                <div class="temp-details">
+                                    <span id="feels-like">Feels like: 0°C</span>
+                                    <span id="min-max">Min: 0°C / Max: 0°C</span>
+                                </div>
+                            </div>
+                            <div class="weather-icon-container">
+                                <img id="weather-icon" class="weather-icon" src="" alt="Weather Icon">
+                                <div class="weather-description" id="weather-description">Weather Description</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="weather-details-grid">
+                        <div class="detail-box">
+                            <i class="fas fa-thermometer-half"></i>
+                            <h4>Pressure</h4>
+                            <p id="pressure">0 hPa</p>
+                        </div>
+                        <div class="detail-box">
+                            <i class="fas fa-tint"></i>
+                            <h4>Humidity</h4>
+                            <p id="humidity">0%</p>
+                        </div>
+                        <div class="detail-box">
+                            <i class="fas fa-wind"></i>
+                            <h4>Wind Speed</h4>
+                            <p id="wind">0 m/s</p>
+                        </div>
+                        <div class="detail-box">
+                            <i class="fas fa-compass"></i>
+                            <h4>Wind Direction</h4>
+                            <p id="wind-direction">N/A</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="air-quality-panel">
+                    <h3><i class="fas fa-lungs"></i> Air Quality</h3>
+                    <div class="air-quality-display">
+                        <div class="aqi-meter">
+                            <div class="aqi-indicator" id="aqi-indicator"></div>
+                            <div class="aqi-scale">
+                                <span>Good</span>
+                                <span>Moderate</span>
+                                <span>Poor</span>
+                                <span>Very Poor</span>
+                            </div>
+                        </div>
+                        <div class="aqi-details">
+                            <h4 id="air-quality-level">Good</h4>
+                            <p id="air-quality-description">Air quality is satisfactory, and air pollution poses little or no risk.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pollutant-grid">
+                        <div class="pollutant-box">
+                            <h5>PM2.5</h5>
+                            <p id="pm2_5">0 μg/m³</p>
+                        </div>
+                        <div class="pollutant-box">
+                            <h5>PM10</h5>
+                            <p id="pm10">0 μg/m³</p>
+                        </div>
+                        <div class="pollutant-box">
+                            <h5>O₃</h5>
+                            <p id="o3">0 μg/m³</p>
+                        </div>
+                        <div class="pollutant-box">
+                            <h5>NO₂</h5>
+                            <p id="no2">0 μg/m³</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="https://openweathermap.org/" target="_blank">OpenWeather API</a>
+                <a href="https://gitlab.com/gitlab-da/sugaroverflow/weather-app" target="_blank">Project Repository</a>
+            </div>
+            <div class="footer-credits">
+                &copy; 2025 Weather Dashboard | Powered by GitLab Developer Advocacy
+            </div>
         </div>
+    </footer>
 
-        <div class="weather-card" id="weather-info">
-            <div class="bg-pattern"></div>
-            <h2 id="city-name">City Name</h2>
-            <div class="location-info">
-                <span id="country-name">Country</span>
-            </div>
-
-            <div class="weather-main">
-                <div class="temp-display" id="temperature">0°C</div>
-                <div class="weather-icon-container">
-                    <img id="weather-icon" class="weather-icon" src="" alt="Weather Icon">
-                    <div class="weather-description" id="weather-description">Weather Description</div>
-                </div>
-            </div>
-
-            <div class="weather-details">
-                <div class="detail-box">
-                    <h4>Feels Like</h4>
-                    <p id="feels-like">0°C</p>
-                </div>
-                <div class="detail-box">
-                    <h4>Min / Max</h4>
-                    <p id="min-max">0°C / 0°C</p>
-                </div>
-                <div class="detail-box">
-                    <h4>Humidity</h4>
-                    <p id="humidity">0%</p>
-                </div>
-                <div class="detail-box">
-                    <h4>Wind Speed</h4>
-                    <p id="wind">0 m/s</p>
-                </div>
-                <div class="detail-box air-quality-box">
-                    <h4>Air Quality</h4>
-                    <p id="air-quality-index">N/A</p>
-                    <span id="air-quality-label" class="quality-label"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchButton = document.getElementById('search-button');
-            const cityInput = document.getElementById('city-input');
-            const weatherInfo = document.getElementById('weather-info');
-            const errorMessage = document.getElementById('error-message');
-
-            // Elements for weather data
-            const cityName = document.getElementById('city-name');
-            const countryName = document.getElementById('country-name');
-            const weatherDescription = document.getElementById('weather-description');
-            const weatherIcon = document.getElementById('weather-icon');
-            const temperature = document.getElementById('temperature');
-            const feelsLike = document.getElementById('feels-like');
-            const minMax = document.getElementById('min-max');
-            const humidity = document.getElementById('humidity');
-            const wind = document.getElementById('wind');
-
-            // Function to fetch weather data
-            async function getWeather(city) {
-                try {
-                    const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);
-                    const data = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(data.error || 'Failed to fetch weather data');
-                    }
-
-                    // Display weather information
-                    cityName.textContent = data.city;
-                    countryName.textContent = data.country;
-                    weatherDescription.textContent = data.weather.description;
-                    weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather.icon}@2x.png`;
-                    temperature.textContent = `${Math.round(data.temperature.current)}°C`;
-                    feelsLike.textContent = `${Math.round(data.temperature.feels_like)}°C`;
-                    minMax.textContent = `${Math.round(data.temperature.min)}°C / ${Math.round(data.temperature.max)}°C`;
-                    humidity.textContent = `${data.humidity}%`;
-                    wind.textContent = `${data.wind.speed} m/s`;
-
-                    // Choose background pattern based on weather
-                    const weatherType = data.weather.main.toLowerCase();
-                    let bgPattern = '';
-                    if (weatherType.includes('clear')) {
-                        document.querySelector('.bg-pattern').style.backgroundImage = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%236e49cb\"><circle cx=\"12\" cy=\"12\" r=\"5\"/></svg>')";
-                    } else if (weatherType.includes('cloud')) {
-                        document.querySelector('.bg-pattern').style.backgroundImage = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%236e49cb\"><path d=\"M19 18H6a4 4 0 1 1 0-8h.71A5 5 0 0 1 17 8a5 5 0 0 1 4 8 4 4 0 0 1-2 3.5\"/></svg>')";
-                    } else if (weatherType.includes('rain')) {
-                        document.querySelector('.bg-pattern').style.backgroundImage = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%236e49cb\"><path d=\"M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9\"/><path d=\"M16 14v6\"/><path d=\"M8 14v6\"/><path d=\"M12 16v6\"/></svg>')";
-                    } else {
-                        document.querySelector('.bg-pattern').style.backgroundImage = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%236e49cb\"><circle cx=\"12\" cy=\"12\" r=\"10\"/></svg>')";
-                    }
-
-                    // Show weather info and hide error
-                    weatherInfo.style.display = 'block';
-                    errorMessage.style.display = 'none';
-
-                    // Get the air quality data after the weather data has loaded
-                    getAirQuality(city);
-
-                } catch (error) {
-                    // Show error message and hide weather info
-                    errorMessage.textContent = error.message;
-                    errorMessage.style.display = 'block';
-                    weatherInfo.style.display = 'none';
-                }
-            }
-            // Function to fetch air quality data
-            async function getAirQuality(city) {
-                try {
-                    const response = await fetch(`/api/air-quality?city=${encodeURIComponent(city)}`);
-                    const data = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(data.error || 'Failed to fetch air quality data');
-                    }
-
-                    // Update air quality display
-                    const airQualityIndex = document.getElementById('air-quality-index');
-                    const airQualityLabel = document.getElementById('air-quality-label');
-
-                    airQualityIndex.textContent = data.air_quality_level;
-                    airQualityLabel.textContent = data.air_quality_index;
-
-                    // Apply appropriate styling based on air quality level
-                    airQualityLabel.className = 'quality-label';
-                    switch (data.air_quality_level) {
-                        case 'Good':
-                            airQualityLabel.classList.add('quality-good');
-                            break;
-                        case 'Fair':
-                        case 'Moderate':
-                            airQualityLabel.classList.add('quality-moderate');
-                            break;
-                        case 'Poor':
-                            airQualityLabel.classList.add('quality-poor');
-                            break;
-                        case 'Very Poor':
-                            airQualityLabel.classList.add('quality-unhealthy');
-                            break;
-                        default:
-                            airQualityLabel.classList.add('quality-moderate');
-                    }
-
-                    return data;
-                } catch (error) {
-                    console.error('Error fetching air quality:', error);
-                    document.getElementById('air-quality-index').textContent = 'N/A';
-                    document.getElementById('air-quality-label').textContent = '';
-                }
-            }
-
-            // Event listener for search button
-            searchButton.addEventListener('click', function () {
-                const city = cityInput.value.trim();
-                if (city) {
-                    getWeather(city);
-                } else {
-                    errorMessage.textContent = 'Please enter a city name';
-                    errorMessage.style.display = 'block';
-                }
-            });
-
-            // Event listener for Enter key in input
-            cityInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    const city = cityInput.value.trim();
-                    if (city) {
-                        getWeather(city);
-                    } else {
-                        errorMessage.textContent = 'Please enter a city name';
-                        errorMessage.style.display = 'block';
-                    }
-                }
-            });
-        });
-    </script>
+    <script src="static/js/weather.js"></script>
 </body>
 
 </html>
