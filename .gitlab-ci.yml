@@ -1,0 +1,53 @@
+# Use GitLab's SAST template which includes security scanning
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  # Excluding other security scanning templates
+  # - template: Security/Dependency-Scanning.gitlab-ci.yml
+  # - template: Security/Container-Scanning.gitlab-ci.yml
+
+# Explicitly disable specific scanners
+container_scanning:
+  script:
+    - echo "Container scanning disabled"
+  rules:
+    - when: never
+
+dependency_scanning:
+  script:
+    - echo "Dependency scanning disabled"
+  rules:
+    - when: never
+
+stages:
+  - test
+  - build
+  - sast
+
+# Basic Python testing
+python-test:
+  stage: test
+  image: python:3.9
+  script:
+    - pip install -r requirements.txt
+    - python -m unittest discover -s . -p "test_*.py"
+
+# Build the application
+build:
+  stage: build
+  image: python:3.9
+  script:
+    - pip install -r requirements.txt
+    - echo "Building application..."
+    - mkdir -p dist/
+    - cp -r *.py templates/ requirements.txt dist/
+  artifacts:
+    paths:
+      - dist/
+
+# The SAST job is included from the template
+# Configuration to make sure vulnerabilities are detected
+sast:
+  stage: sast
+  variables:
+    SAST_EXCLUDED_PATHS: "tests, venv"
+    SEARCH_MAX_DEPTH: 20

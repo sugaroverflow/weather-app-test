@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="32" cy="32" r="30" fill="#4dabf7" />
+  
+  <!-- Sun -->
+  <circle cx="22" cy="26" r="10" fill="#ffd43b" />
+  
+  <!-- Sun Rays -->
+  <line x1="22" y1="12" x2="22" y2="16" stroke="#ffd43b" stroke-width="2" stroke-linecap="round" />
+  <line x1="22" y1="36" x2="22" y2="40" stroke="#ffd43b" stroke-width="2" stroke-linecap="round" />
+  <line x1="8" y1="26" x2="12" y2="26" stroke="#ffd43b" stroke-width="2" stroke-linecap="round" />
+  <line x1="32" y1="26" x2="36" y2="26" stroke="#ffd43b" stroke-width="2" stroke-linecap="round" />
+  <line x1="12" y1="16" x2="15" y2="19" stroke="#ffd43b" stroke-width="2" stroke-linecap="round" />
+  <line x1="29" y1="33" x2="32" y2="36" stroke="#ffd43b" stroke-width="2" stroke-linecap="round" />
+  <line x1="12" y1="36" x2="15" y2="33" stroke="#ffd43b" stroke-width="2" stroke-linecap="round" />
+  <line x1="29" y1="19" x2="32" y2="16" stroke="#ffd43b" stroke-width="2" stroke-linecap="round" />
+  
+  <!-- Clouds -->
+  <path d="M46 28c-1.1 0-2.1 0.3-3 0.8-0.3-2.7-2.5-4.8-5.2-4.8-2.4 0-4.4 1.6-5 3.9-0.6-0.3-1.1-0.4-1.8-0.4-2.2 0-4 1.8-4 4 0 2.2 1.8 4 4 4h15c2.2 0 4-1.8 4-4 0-2.2-1.8-3.5-4-3.5z" fill="white" />
+  
+  <!-- Raindrops -->
+  <path d="M38 40c0 1.1-0.9 2-2 2s-2-0.9-2-2 2-4 2-4 2 2.9 2 4z" fill="#74c0fc" />
+  <path d="M46 42c0 1.1-0.9 2-2 2s-2-0.9-2-2 2-4 2-4 2 2.9 2 4z" fill="#74c0fc" />
+  <path d="M50 38c0 1.1-0.9 2-2 2s-2-0.9-2-2 2-4 2-4 2 2.9 2 4z" fill="#74c0fc" />
+  
+  <!-- Heartbeat Line -->
+  <path d="M14 44c0 0 3-2 5 0 2 2 4 0 4 0 2-2 4 0 6 0 2 0 4-2 6-2 2 0 3 2 5 2" stroke="#ff6b6b" stroke-width="2" fill="none" stroke-linecap="round" />
+</svg>
