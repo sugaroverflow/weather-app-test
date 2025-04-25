@@ -65,7 +65,6 @@ class WeatherAppTests(unittest.TestCase):
     @patch('app.requests.get')
     def test_weather_endpoint_success(self, mock_get):
         """Test that the weather endpoint returns formatted data."""
-        # Mock the response from OpenWeatherMap API
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
@@ -85,7 +84,6 @@ class WeatherAppTests(unittest.TestCase):
         }
         mock_get.return_value = mock_response
 
-        # Test the endpoint
         response = self.app.get('/api/weather?city=London')
         data = json.loads(response.data)
 
@@ -99,14 +97,11 @@ class WeatherAppTests(unittest.TestCase):
 
     @patch('app.requests.get')
     def test_weather_endpoint_city_not_found(self, mock_get):
-        """Test that the weather endpoint handles city not found errors."""
-        # Mock the response for city not found
         mock_response = MagicMock()
         mock_response.status_code = 404
         mock_response.json.return_value = {'message': 'city not found'}
         mock_get.return_value = mock_response
 
-        # Test the endpoint
         response = self.app.get('/api/weather?city=NonExistentCity')
         data = json.loads(response.data)
 
@@ -115,11 +110,7 @@ class WeatherAppTests(unittest.TestCase):
 
     @patch('app.requests.get')
     def test_weather_endpoint_network_error(self, mock_get):
-        """Test that the weather endpoint handles network errors."""
-        # Mock a network error
         mock_get.side_effect = Exception('Network error')
-
-        # Test the endpoint
         response = self.app.get('/api/weather?city=London')
         data = json.loads(response.data)
 
@@ -127,41 +118,30 @@ class WeatherAppTests(unittest.TestCase):
         self.assertTrue('Server error' in data['error'])
 
     def test_validate_city_param(self):
-        """Test the city parameter validation function."""
-        # Valid city names
         self.assertTrue(validate_city_param('London')[0])
         self.assertTrue(validate_city_param('New York')[0])
         self.assertTrue(validate_city_param('San Francisco, CA')[0])
-
-        # Invalid city names
         self.assertFalse(validate_city_param('')[0])
         self.assertFalse(validate_city_param(None)[0])
         self.assertFalse(validate_city_param('123')[0])
         self.assertFalse(validate_city_param('City#$%')[0])
 
     def test_get_air_quality_level(self):
-        """Test the air quality level lookup function."""
-        # Test each AQI level
         for i in range(1, 6):
             result = get_air_quality_level(i)
             self.assertIn('level', result)
             self.assertIn('description', result)
-
-        # Test invalid AQI
         result = get_air_quality_level(10)
         self.assertEqual(result['level'], 'Unknown')
 
     @patch('app.requests.get')
     def test_air_quality_endpoint_success(self, mock_get):
-        """Test that the air quality endpoint returns formatted data."""
-        # Mock the geo response
         mock_geo_response = MagicMock()
         mock_geo_response.status_code = 200
         mock_geo_response.json.return_value = [
             {'name': 'London', 'lat': 51.5074, 'lon': -0.1278}
         ]
 
-        # Mock the air quality response
         mock_air_response = MagicMock()
         mock_air_response.status_code = 200
         mock_air_response.json.return_value = {
@@ -181,7 +161,6 @@ class WeatherAppTests(unittest.TestCase):
             }]
         }
 
-        # Configure the mock to return different responses for different URLs
         def get_side_effect(url, **kwargs):
             if 'geo/1.0/direct' in url:
                 return mock_geo_response
@@ -191,7 +170,6 @@ class WeatherAppTests(unittest.TestCase):
 
         mock_get.side_effect = get_side_effect
 
-        # Test the endpoint
         response = self.app.get('/api/air-quality?city=London')
         data = json.loads(response.data)
 
@@ -206,15 +184,11 @@ class WeatherAppTests(unittest.TestCase):
 
     @patch('app.requests.get')
     def test_air_quality_endpoint_location_not_found(self, mock_get):
-        """Test that the air quality endpoint handles location not found errors."""
-        # Mock the geo response for location not found
         mock_geo_response = MagicMock()
         mock_geo_response.status_code = 200
         mock_geo_response.json.return_value = []
-
         mock_get.return_value = mock_geo_response
 
-        # Test the endpoint
         response = self.app.get('/api/air-quality?city=NonExistentCity')
         data = json.loads(response.data)
 
@@ -223,20 +197,16 @@ class WeatherAppTests(unittest.TestCase):
 
     @patch('app.requests.get')
     def test_air_quality_endpoint_no_data(self, mock_get):
-        """Test that the air quality endpoint handles no data available."""
-        # Mock the geo response
         mock_geo_response = MagicMock()
         mock_geo_response.status_code = 200
         mock_geo_response.json.return_value = [
             {'name': 'London', 'lat': 51.5074, 'lon': -0.1278}
         ]
 
-        # Mock the air quality response with no data
         mock_air_response = MagicMock()
         mock_air_response.status_code = 200
         mock_air_response.json.return_value = {'list': []}
 
-        # Configure the mock to return different responses for different URLs
         def get_side_effect(url, **kwargs):
             if 'geo/1.0/direct' in url:
                 return mock_geo_response
@@ -246,7 +216,6 @@ class WeatherAppTests(unittest.TestCase):
 
         mock_get.side_effect = get_side_effect
 
-        # Test the endpoint
         response = self.app.get('/api/air-quality?city=London')
         data = json.loads(response.data)
 
@@ -254,7 +223,6 @@ class WeatherAppTests(unittest.TestCase):
         self.assertEqual(data['error'], 'No air quality data available')
 
     def test_advanced_weather_processor_missing_data(self):
-        """Test that the advanced weather processor requires data."""
         response = self.app.post('/api/advanced-weather-processor',
                                  json={},
                                  content_type='application/json')
@@ -265,7 +233,6 @@ class WeatherAppTests(unittest.TestCase):
             data['error'], 'Weather data and transformation are required')
 
     def test_advanced_weather_processor_valid_operation(self):
-        """Test the advanced weather processor with a valid operation."""
         test_payload = {
             'weather_data': {'temp': 20, 'humidity': 80},
             'transformation': {
@@ -284,7 +251,6 @@ class WeatherAppTests(unittest.TestCase):
         self.assertEqual(data['original_data'], test_payload['weather_data'])
 
     def test_advanced_weather_processor_invalid_operation(self):
-        """Test the advanced weather processor with an invalid operation."""
         test_payload = {
             'weather_data': {'temp': 20, 'humidity': 80},
             'transformation': {
@@ -300,6 +266,62 @@ class WeatherAppTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn('not allowed', data['error'])
+
+    def test_advanced_weather_processor_average_operation(self):
+        test_payload = {
+            'weather_data': {'temps': [20, 25, 30]},
+            'transformation': {
+                'operation': 'average',
+                'parameters': [[20, 25, 30]]
+            }
+        }
+
+        response = self.app.post('/api/advanced-weather-processor',
+                                 json=test_payload,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertAlmostEqual(data['transformed_data'], 25.0)
+
+    def test_advanced_weather_processor_round_operation(self):
+        test_payload = {
+            'weather_data': {'value': 22.76},
+            'transformation': {
+                'operation': 'round',
+                'parameters': [22.76]
+            }
+        }
+
+        response = self.app.post('/api/advanced-weather-processor',
+                                 json=test_payload,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['transformed_data'], 23)
+
+    def test_advanced_weather_processor_missing_parameters(self):
+        test_payload = {
+            'weather_data': {'temp': 20},
+            'transformation': {
+                'operation': 'add'
+            }
+        }
+
+        response = self.app.post('/api/advanced-weather-processor',
+                                 json=test_payload,
+                                 content_type='application/json')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Processing failed', data['error'])
+
+    def test_advanced_weather_processor_invalid_json(self):
+        response = self.app.post('/api/advanced-weather-processor',
+                                 data="not a json",
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
 
 
 if __name__ == '__main__':
