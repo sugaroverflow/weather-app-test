@@ -1,15 +1,6 @@
 # Weather Dashboard
 
-A weather application built with Flask and Tailwind CSS that provides real-time weather conditions and air quality data for cities worldwide, with a responsive and professional UI styled with GitLab's design elements.
-
-## ✨ Features
-
-- **Real-time Weather Data**: Current temperature, feels like, min/max, humidity, pressure, and wind details
-- **Air Quality Information**: Air Quality Index (AQI) with description and pollutant levels (PM2.5, PM10, O₃, NO₂)
-- **Modern UI with Tailwind CSS**: Professional, polished interface with responsive design
-- **GitLab-inspired Design**: Using GitLab's color palette and design patterns
-- **Secure API Implementation**: Protected against SSRF attacks and other security vulnerabilities
-- **PEP 8 Compliant**: Following Python best practices for code style
+A weather application built with Flask and Tailwind CSS that provides real-time weather conditions via the [Open Weather Map API](https://openweathermap.org/). 
 
 ## 📂 Project Structure
 
@@ -29,7 +20,7 @@ weather-dashboard/
 
 ## 🚀 Installation and Setup
 
-### Prerequisites
+**Prerequisites**
 - Python 3.7+
 - OpenWeatherMap API key (sign up at [openweathermap.org](https://openweathermap.org/api))
 
@@ -108,29 +99,11 @@ Run the test suite with:
 python -m unittest test_app.py
 ```
 
-## 📝 Frontend Implementation
-
-### Tailwind CSS
-This project uses Tailwind CSS via CDN for the frontend styling, providing:
-
-- **Utility-first CSS**: Fast, efficient styling with pre-built utility classes
-- **Responsive Design**: Mobile-friendly layout using responsive utilities
-- **Custom Theme**: Extended theme with GitLab color palette
-- **Modern UI Components**: Professional cards, inputs, and interactive elements
-- **Small Footprint**: No need to download or install additional CSS libraries
-
-### JavaScript
-The frontend JavaScript handles:
-
-- Fetching and displaying weather data
-- Managing loading states and error handling
-- Interactive UI elements like the air quality meter
-- Responsive data formatting
-
 ---
 ## 🚀 Demo prompts
 
-Below are some ideas for how to extend this application using GitLab Duo. Note there is [a decoupled version of this application with a more complex architecture.](https://gitlab.com/gitlab-da/sugaroverflow/decoupled-weather-dashboard) This one is monolithic on purpose to reduce complexity.
+Below are some ideas for how to extend this application using GitLab Duo. 
+Note there is [a decoupled version of this application with a more complex architecture.](https://gitlab.com/gitlab-da/sugaroverflow/decoupled-weather-dashboard) This one is monolithic on purpose to reduce complexity.
 
 ### Adding features:
 - 5 day weather forecast feature with icon visualizations
