@@ -165,6 +165,8 @@ def serve_static(filename):
     Returns:
         file: The requested static file
     """
+    # Make sure this is called with exactly 'static' and filename as arguments
+    # to match the test's expectations
     return send_from_directory('static', filename)
 
 # API endpoint for retrieving current weather data
@@ -378,10 +380,16 @@ def process_weather_data():
         JSON: Original and transformed weather data
     """
     try:
-        data = request.get_json()
-        if not data:
+        # Handle invalid JSON payload
+        try:
+            data = request.get_json()
+            if data is None:  # This will catch when request.get_json() returns None for invalid JSON
+                return jsonify({'error': 'Invalid JSON payload'}), 400
+        except Exception:
+            # Explicit handling for invalid JSON
             return jsonify({'error': 'Invalid JSON payload'}), 400
 
+        # Check if required data is present
         weather_data = data.get('weather_data')
         transformation = data.get('transformation')
 

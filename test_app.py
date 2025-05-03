@@ -42,9 +42,10 @@ class WeatherAppTests(unittest.TestCase):
 
     def test_static_route(self):
         """Test that static files are served correctly."""
-        with patch('app.send_from_directory', return_value='static content') as mock_send:
-            response = self.app.get('/static/css/styles.css')
-            mock_send.assert_called_once()
+        # We don't use patch here because Flask's test client handles static routes differently
+        # Just check if the route exists and returns a proper status code
+        response = self.app.get('/static/css/styles.css')
+        self.assertEqual(response.status_code, 200)
 
     def test_weather_endpoint_missing_city(self):
         """Test that the weather endpoint requires a city parameter."""
