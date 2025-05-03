@@ -2,6 +2,17 @@
 
 A weather application built with Flask and Tailwind CSS that provides real-time weather conditions via the [Open Weather Map API](https://openweathermap.org/). 
 
+## 📋 Table of Contents
+- [Project Structure](#-project-structure)
+- [Installation and Setup](#-installation-and-setup)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the Application](#running-the-application)
+- [API Endpoints](#-api-endpoints)
+- [Features](#-features)
+- [Testing](#-testing)
+- [Demo Prompts](#-demo-prompts)
+
 ## 📂 Project Structure
 
 ```
@@ -75,6 +86,12 @@ The application will be available at:
 - **Parameters**: `city` (required) - Name of the city
 - **Response**: JSON object containing formatted weather data
 
+### Get 5-Day Forecast
+- **URL**: `/api/forecast`
+- **Method**: `GET`
+- **Parameters**: `city` (required) - Name of the city
+- **Response**: JSON object containing daily forecasts for the next 5 days with weather descriptions and icons
+
 ### Get Air Quality
 - **URL**: `/api/air-quality`
 - **Method**: `GET`
@@ -92,6 +109,17 @@ The application will be available at:
 - **Method**: `GET`
 - **Response**: `{"status": "ok", "version": "1.1.0"}`
 
+## 🌟 Features
+
+### Current Weather
+Displays real-time weather information including temperature, humidity, pressure, and wind data.
+
+### 5-Day Weather Forecast
+Shows a 5-day forecast with daily weather conditions, complete with weather icons and temperature averages.
+
+### Air Quality Information
+Provides detailed air quality data with an easy-to-understand visual indicator and pollutant measurements.
+
 ## 🧪 Testing
 
 Run the test suite with:
@@ -106,7 +134,6 @@ Below are some ideas for how to extend this application using GitLab Duo.
 Note there is [a decoupled version of this application with a more complex architecture.](https://gitlab.com/gitlab-da/sugaroverflow/decoupled-weather-dashboard) This one is monolithic on purpose to reduce complexity.
 
 ### Adding features:
-- 5 day weather forecast feature with icon visualizations
 - Integrate with a mapping service to show geographic weather patterns
 - Add a units toggle for metric and imperial
 - Add a dark mode for theme switching

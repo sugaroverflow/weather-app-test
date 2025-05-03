@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const o3 = document.getElementById('o3');
     const no2 = document.getElementById('no2');
 
+    // Element for forecast data
+    const forecastContainer = document.getElementById('forecast-container');
+
     /**
      * Format date from Unix timestamp
      * @param {number} timestamp - Unix timestamp
@@ -41,21 +44,36 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     function formatDateTime(timestamp) {
         const date = new Date(timestamp * 1000);
-        const options = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         };
-        const timeOptions = { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+        const timeOptions = {
+            hour: '2-digit',
+            minute: '2-digit'
         };
 
         return {
             date: date.toLocaleDateString('en-US', options),
             time: date.toLocaleTimeString('en-US', timeOptions)
         };
+    }
+
+    /**
+     * Format date string to a more readable format
+     * @param {string} dateStr - Date string in YYYY-MM-DD format
+     * @returns {string} - Formatted date string
+     */
+    function formatDateString(dateStr) {
+        const date = new Date(dateStr);
+        const options = {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        };
+        return date.toLocaleDateString('en-US', options);
     }
 
     /**
@@ -126,14 +144,14 @@ document.addEventListener('DOMContentLoaded', function () {
             weatherDescription.textContent = data.weather.description;
             weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather.icon}@2x.png`;
             weatherIcon.alt = data.weather.description;
-            
+
             temperature.textContent = `${Math.round(data.temperature.current)}°C`;
             feelsLike.textContent = `${Math.round(data.temperature.feels_like)}°C`;
             minMax.textContent = `${Math.round(data.temperature.min)}°C / ${Math.round(data.temperature.max)}°C`;
             humidity.textContent = `${data.humidity}%`;
             pressure.textContent = `${data.pressure} hPa`;
             wind.textContent = `${data.wind.speed} m/s`;
-            
+
             // Wind direction
             const direction = getWindDirection(data.wind.degrees);
             windDirection.textContent = direction;
@@ -141,8 +159,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // Show weather info
             weatherInfo.style.display = 'block';
 
-            // Get air quality data after weather data is loaded
+            // Get air quality and forecast data after weather data is loaded
             getAirQuality(city);
+            getForecast(city);
 
         } catch (error) {
             // Show error message and hide weather info
@@ -186,13 +205,74 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error fetching air quality:', error);
             airQualityLevel.textContent = 'Unavailable';
             airQualityDescription.textContent = 'Air quality data could not be loaded.';
-            
+
             // Reset pollutant values
             pm25.textContent = 'N/A';
             pm10.textContent = 'N/A';
             o3.textContent = 'N/A';
             no2.textContent = 'N/A';
         }
+    }
+
+    /**
+     * Fetch 5-day forecast data from API
+     * @param {string} city - City name
+     */
+    async function getForecast(city) {
+        try {
+            const response = await fetch(`/api/forecast?city=${encodeURIComponent(city)}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to fetch forecast data');
+            }
+
+            // Clear previous forecast data
+            forecastContainer.innerHTML = '';
+
+            // Create and append forecast cards
+            data.forecasts.forEach(day => {
+                const card = createForecastCard(day);
+                forecastContainer.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error('Error fetching forecast:', error);
+            forecastContainer.innerHTML = `
+                <div class="col-span-5 text-center py-4">
+                    <p class="text-gray-600">Forecast data could not be loaded.</p>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Create a forecast card element
+     * @param {Object} day - Daily forecast data
+     * @returns {HTMLElement} - Forecast card element
+     */
+    function createForecastCard(day) {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-sm border border-gray-100 p-4 text-center transition-all hover:shadow-card-hover accent-line-top';
+
+        const formattedDate = formatDateString(day.date);
+
+        card.innerHTML = `
+            <h4 class="font-medium text-primary-dark mb-2">${formattedDate}</h4>
+            <div class="flex justify-center mb-1">
+                <img src="https://openweathermap.org/img/wn/${day.weather.icon}@2x.png" 
+                     alt="${day.weather.description}" 
+                     class="w-16 h-16">
+            </div>
+            <p class="text-lg font-semibold text-primary-dark mb-1">${Math.round(day.temp)}°C</p>
+            <p class="text-sm text-gray-600 capitalize mb-2">${day.weather.description}</p>
+            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                <span><i class="fas fa-tint mr-1"></i> ${day.humidity}%</span>
+                <span><i class="fas fa-wind mr-1"></i> ${day.wind_speed} m/s</span>
+            </div>
+        `;
+
+        return card;
     }
 
     // Event listener for search button

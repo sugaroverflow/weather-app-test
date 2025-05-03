@@ -15,7 +15,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Get API key from environment variables
-OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+OPENWEATHER_API_KEY = os.environ.get('OPENWEATHER_API_KEY')
 if not OPENWEATHER_API_KEY:
     # For demo purposes, we'll set a placeholder
     OPENWEATHER_API_KEY = "your_api_key_here"
@@ -237,6 +237,120 @@ def get_weather():
 
     except requests.exceptions.RequestException as e:
         # Handle network-related errors (connection issues, timeouts, etc.)
+        return jsonify({'error': f'Network error: {str(e)}'}), 500
+    except Exception as e:
+        # Catch-all for other unexpected errors
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+# New API endpoint for 5-day forecast
+@app.route('/api/forecast', methods=['GET'])
+@require_api_key
+def get_forecast():
+    """
+    Get 5-day forecast data for a specified city.
+
+    Query Parameters:
+        city (str): The name of the city to get forecast data for
+
+    Returns:
+        JSON: Forecast data for the specified city or error message
+    """
+    # Extract city from query parameters
+    city = request.args.get('city')
+
+    # Validate input
+    is_valid, error_message = validate_city_param(city)
+    if not is_valid:
+        return jsonify({'error': error_message}), 400
+
+    try:
+        # Construct URL for OpenWeatherMap 5-day forecast API
+        forecast_url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+
+        # Validate URL before making request
+        if not _is_valid_url(forecast_url):
+            return jsonify({'error': 'Invalid request URL'}), 400
+
+        # Make request to external API
+        forecast_response = requests.get(forecast_url, timeout=10)
+        forecast_data = forecast_response.json()
+
+        # Handle API error responses
+        if forecast_response.status_code != 200:
+            return jsonify({'error': forecast_data.get('message', 'Failed to fetch forecast data')}), forecast_response.status_code
+
+        # Group forecast by day
+        daily_forecasts = {}
+        
+        for item in forecast_data['list']:
+            # Get date from timestamp (without time)
+            date = item['dt_txt'].split(' ')[0]
+            
+            if date not in daily_forecasts:
+                daily_forecasts[date] = {
+                    'date': date,
+                    'temps': [],
+                    'weather': [],
+                    'humidity': [],
+                    'wind_speed': []
+                }
+            
+            # Append data for aggregation
+            daily_forecasts[date]['temps'].append(item['main']['temp'])
+            daily_forecasts[date]['weather'].append({
+                'main': item['weather'][0]['main'],
+                'description': item['weather'][0]['description'],
+                'icon': item['weather'][0]['icon']
+            })
+            daily_forecasts[date]['humidity'].append(item['main']['humidity'])
+            daily_forecasts[date]['wind_speed'].append(item['wind']['speed'])
+        
+        # Transform daily data (calculate averages, select most frequent weather condition)
+        formatted_forecasts = []
+        
+        for date, data in daily_forecasts.items():
+            # Calculate average temperature and round to 1 decimal
+            avg_temp = round(sum(data['temps']) / len(data['temps']), 1)
+            
+            # Get the most frequent weather condition
+            weather_counts = {}
+            for w in data['weather']:
+                icon = w['icon']
+                if icon not in weather_counts:
+                    weather_counts[icon] = 0
+                weather_counts[icon] += 1
+            
+            most_frequent_icon = max(weather_counts.items(), key=lambda x: x[1])[0]
+            most_frequent_weather = next(w for w in data['weather'] if w['icon'] == most_frequent_icon)
+            
+            # Calculate average humidity and wind speed
+            avg_humidity = round(sum(data['humidity']) / len(data['humidity']))
+            avg_wind_speed = round(sum(data['wind_speed']) / len(data['wind_speed']), 1)
+            
+            # Format the forecast for this day
+            formatted_forecast = {
+                'date': date,
+                'temp': avg_temp,
+                'weather': most_frequent_weather,
+                'humidity': avg_humidity,
+                'wind_speed': avg_wind_speed
+            }
+            
+            formatted_forecasts.append(formatted_forecast)
+        
+        # Sort forecasts by date and limit to 5 days
+        formatted_forecasts.sort(key=lambda x: x['date'])
+        formatted_forecasts = formatted_forecasts[:5]
+        
+        # Return the formatted response
+        return jsonify({
+            'city': forecast_data['city']['name'],
+            'country': forecast_data['city']['country'],
+            'forecasts': formatted_forecasts
+        })
+
+    except requests.exceptions.RequestException as e:
+        # Handle network-related errors
         return jsonify({'error': f'Network error: {str(e)}'}), 500
     except Exception as e:
         # Catch-all for other unexpected errors
