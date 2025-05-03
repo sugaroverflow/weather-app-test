@@ -178,8 +178,6 @@ def get_air_quality_level(aqi):
 
 
 # Route to serve the frontend HTML page
-
-
 @app.route("/")
 def index():
     """
@@ -192,8 +190,6 @@ def index():
 
 
 # Route to serve static files
-
-
 @app.route("/static/<path:filename>")
 def serve_static(filename):
     """
@@ -296,8 +292,6 @@ def get_weather():
 
 
 # New API endpoint for 5-day forecast
-
-
 @app.route("/api/forecast", methods=["GET"])
 @require_api_key
 def get_forecast():
@@ -428,8 +422,6 @@ def get_forecast():
 
 
 # Advanced endpoint for custom weather data processing
-
-
 @app.route("/api/advanced-weather-processor", methods=["POST"])
 @require_api_key
 def process_weather_data():
@@ -509,8 +501,6 @@ def process_weather_data():
 
 
 # Implementation for the air quality endpoint with efficient processing and proper error handling
-
-
 @app.route("/api/air-quality", methods=["GET"])
 @require_api_key
 def get_air_quality():
@@ -616,8 +606,6 @@ def get_air_quality():
 
 
 # Health check endpoint for monitoring and load balancers
-
-
 @app.route("/api/health", methods=["GET"])
 def health_check():
     """
