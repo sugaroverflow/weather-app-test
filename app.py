@@ -207,8 +207,6 @@ def serve_static(filename):
 
 
 # API endpoint for retrieving current weather data
-
-
 @app.route("/api/weather", methods=["GET"])
 @require_api_key
 def get_weather():
