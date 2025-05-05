@@ -1,26 +1,16 @@
 # test_app.py
 import unittest
 from unittest.mock import patch, MagicMock
-from app import app, validate_city_param, get_air_quality_level
 import json
 import os
 
+# Set up environment variable before importing app
+os.environ['OPENWEATHER_API_KEY'] = 'test_api_key'
+
+from app import app, validate_city_param, get_air_quality_level
 
 class WeatherAppTests(unittest.TestCase):
     """Tests for the Weather App application."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Set up test environment before any tests run."""
-        # Mock the environment variable before app is imported
-        cls.env_patcher = patch.dict(
-            os.environ, {'OPENWEATHER_API_KEY': 'test_api_key'})
-        cls.env_patcher.start()
-
-    @classmethod
-    def tearDownClass(cls):
-        """Clean up after all tests."""
-        cls.env_patcher.stop()
 
     def setUp(self):
         """Set up test client before each test."""
