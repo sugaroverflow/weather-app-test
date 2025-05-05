@@ -1,10 +1,13 @@
 # test_app.py
 import unittest
 from unittest.mock import patch, MagicMock
-from app import app, validate_city_param, get_air_quality_level
 import json
 import os
 
+# Set up environment variable before importing app
+os.environ['OPENWEATHER_API_KEY'] = 'test_api_key'
+
+from app import app, validate_city_param, get_air_quality_level
 
 class WeatherAppTests(unittest.TestCase):
     """Tests for the Weather App application."""
@@ -14,14 +17,9 @@ class WeatherAppTests(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-        # Mock the environment variable
-        self.env_patcher = patch.dict(
-            os.environ, {'OPENWEATHER_API_KEY': 'test_api_key'})
-        self.env_patcher.start()
-
     def tearDown(self):
         """Clean up after each test."""
-        self.env_patcher.stop()
+        pass
 
     def test_health_check(self):
         """Test that the health check endpoint returns OK status."""
