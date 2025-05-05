@@ -9,19 +9,27 @@ import os
 class WeatherAppTests(unittest.TestCase):
     """Tests for the Weather App application."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up test environment before any tests run."""
+        # Mock the environment variable before app is imported
+        cls.env_patcher = patch.dict(
+            os.environ, {'OPENWEATHER_API_KEY': 'test_api_key'})
+        cls.env_patcher.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Clean up after all tests."""
+        cls.env_patcher.stop()
+
     def setUp(self):
         """Set up test client before each test."""
         self.app = app.test_client()
         self.app.testing = True
 
-        # Mock the environment variable
-        self.env_patcher = patch.dict(
-            os.environ, {'OPENWEATHER_API_KEY': 'test_api_key'})
-        self.env_patcher.start()
-
     def tearDown(self):
         """Clean up after each test."""
-        self.env_patcher.stop()
+        pass
 
     def test_health_check(self):
         """Test that the health check endpoint returns OK status."""
