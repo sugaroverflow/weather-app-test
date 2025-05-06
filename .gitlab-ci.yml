@@ -63,11 +63,8 @@ publish-package:
     
     # Set up npm credentials for GitLab registry
     - cd package-build
-    - |
-      cat > .npmrc << EOF
-      //gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}
-      @weather-app:registry=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/
-      EOF
+    - echo "//gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" > .npmrc
+    - echo "@weather-app:registry=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" >> .npmrc
     
     # Inspect environment
     - env | grep CI_
