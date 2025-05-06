@@ -34,3 +34,7 @@ ENV/
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Exceptions - Don't ignore these directories
+!.gitlab/packages/
+!static/vendor/

@@ -10,6 +10,7 @@ A weather application built with Flask and Tailwind CSS that provides real-time 
   - [Running the Application](#running-the-application)
 - [API Endpoints](#-api-endpoints)
 - [Features](#-features)
+- [Local Map Implementation](#-local-map-implementation)
 - [Testing](#-testing)
 - [Demo Prompts](#-demo-prompts)
 
@@ -20,7 +21,10 @@ weather-dashboard/
 ├── app.py                  # Main Flask application
 ├── static/                 # Static files directory
 │   ├── js/                 # JavaScript files
-│   │   └── weather.js      # Weather data handling script
+│   │   ├── weather.js      # Weather data handling script
+│   │   └── map.js          # Mapbox implementation script
+│   └── vendor/             # Third-party libraries
+│       └── mapbox-gl/      # Local Mapbox GL JS files
 ├── templates/              # HTML templates
 │   └── index.html          # Frontend interface with Tailwind CSS
 ├── test_app.py             # Unit tests
@@ -119,6 +123,28 @@ Shows a 5-day forecast with daily weather conditions, complete with weather icon
 
 ### Air Quality Information
 Provides detailed air quality data with an easy-to-understand visual indicator and pollutant measurements.
+
+## 🗺️ Local Map Implementation
+
+For demo purposes and offline functionality, this project uses locally stored Mapbox GL JS files rather than loading them from CDN:
+
+### Local Files Structure
+- `static/vendor/mapbox-gl/mapbox-gl.js` - The Mapbox GL JavaScript library
+- `static/vendor/mapbox-gl/mapbox-gl.css` - The Mapbox GL CSS styles
+
+### Benefits of Local Implementation
+- **Offline demos**: Present the application without requiring internet access
+- **Performance**: Eliminates network dependency for loading map resources
+- **Self-contained package**: All resources are included in the GitLab repository
+
+### Mapbox Token
+The application still requires a valid Mapbox access token for map tiles and services. This is configured in the map.js file:
+
+```javascript
+const mapboxToken = 'your_mapbox_token';
+```
+
+If you need to update this token, edit the `static/js/map.js` file.
 
 ## 🧪 Testing
 

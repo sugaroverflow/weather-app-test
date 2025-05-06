@@ -39,7 +39,7 @@ build:
     - pip install -r requirements.txt
     - echo "Building application..."
     - mkdir -p dist/
-    - cp -r *.py templates/ requirements.txt dist/
+    - cp -r *.py templates/ static/ requirements.txt dist/
   artifacts:
     paths:
       - dist/
