@@ -16,6 +16,7 @@ app = Flask(__name__)
 
 # Get API key from environment variables
 OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY")
+
 if not OPENWEATHER_API_KEY:
     # For demo purposes, we'll set a placeholder
     OPENWEATHER_API_KEY = "your_api_key_here"
@@ -186,7 +187,7 @@ def index():
     Returns:
         rendered template: The main index.html template
     """
-    return render_template("index.html")
+    return render_template("index.html", openweather_api_key=OPENWEATHER_API_KEY)
 
 
 # Route to serve static files

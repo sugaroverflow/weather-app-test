@@ -159,6 +159,28 @@ document.addEventListener('DOMContentLoaded', function () {
             // Show weather info
             weatherInfo.style.display = 'block';
 
+            // Ensure the map is properly sized after the container becomes visible
+            setTimeout(() => {
+                if (window.map) {
+                    window.map.resize();
+                }
+            }, 200);
+
+            // Center the map on the searched city and show regional weather
+            if (typeof centerMapOnLocation === 'function' && typeof showRegionalWeather === 'function') {
+                centerMapOnLocation(data.coordinates);
+
+                // Use the API key passed from the Flask backend or the default key
+                const apiKey = window.OPENWEATHER_API_KEY || 'c10bb3bd22f90d636baa008b1d375bd4';
+                console.log('Using API key (first 5 chars):', apiKey.substring(0, 5) + '...');
+                
+                showRegionalWeather(
+                    data.coordinates.lat,
+                    data.coordinates.lon,
+                    apiKey
+                );
+            }
+
             // Get air quality and forecast data after weather data is loaded
             getAirQuality(city);
             getForecast(city);

@@ -1,0 +1,50 @@
+#weather-map {
+    height: 400px;
+    width: 100%;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.weather-popup {
+    padding: 10px;
+    text-align: center;
+}
+
+.weather-popup h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.weather-popup .temperature {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 5px 0;
+    color: #2c3e50;
+}
+
+.weather-popup .weather-description {
+    text-transform: capitalize;
+    color: #666;
+    margin: 5px 0;
+}
+
+.weather-popup .weather-details {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.weather-popup .weather-details p {
+    margin: 5px 0;
+}
+
+.weather-icon {
+    background: none;
+    border: none;
+}
+
+.weather-icon img {
+    width: 50px;
+    height: 50px;
+} 
