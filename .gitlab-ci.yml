@@ -54,10 +54,23 @@ publish-package:
   stage: publish
   image: node:16
   script:
+    # Debug info
+    - echo "Project ID: $CI_PROJECT_ID"
+    - echo "Job Token available: $([[ -n $CI_JOB_TOKEN ]] && echo 'Yes' || echo 'No')"
+    # Set up package
     - cd .gitlab/packages/
     - cp mapbox-gl.npm package.json
-    - echo "//gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" > .npmrc
-    - npm publish
+    # Set up npm configuration with proper escaping
+    - echo "//gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/npm/:_authToken=$CI_JOB_TOKEN" > .npmrc
+    - echo "@weather-app:registry=https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/npm/" >> .npmrc
+    # Add local files for publishing
+    - mkdir -p ../../static/vendor/mapbox-gl/
+    - touch ../../static/vendor/mapbox-gl/mapbox-gl.js
+    - touch ../../static/vendor/mapbox-gl/mapbox-gl.css
+    # Publish
+    - cat .npmrc
+    - npm config list
+    - npm publish --verbose
   only:
     - main
     - feature/map-visualization

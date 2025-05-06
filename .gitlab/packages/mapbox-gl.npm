@@ -2,11 +2,11 @@
   "name": "@weather-app/mapbox-gl",
   "version": "2.15.0",
   "description": "Local copy of Mapbox GL JS for offline demos",
-  "main": "../../static/vendor/mapbox-gl/mapbox-gl.js",
-  "style": "../../static/vendor/mapbox-gl/mapbox-gl.css",
+  "main": "static/vendor/mapbox-gl/mapbox-gl.js",
+  "style": "static/vendor/mapbox-gl/mapbox-gl.css",
   "files": [
-    "../../static/vendor/mapbox-gl/mapbox-gl.js",
-    "../../static/vendor/mapbox-gl/mapbox-gl.css"
+    "static/vendor/mapbox-gl/mapbox-gl.js",
+    "static/vendor/mapbox-gl/mapbox-gl.css"
   ],
   "publishConfig": {
     "access": "public",
