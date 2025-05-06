@@ -30,6 +30,10 @@ python-test:
   image: python:3.9
   script:
     - pip install -r requirements.txt
+    # Ensure static directories exist for tests
+    - mkdir -p static/css static/js static/vendor/mapbox-gl
+    - echo "/* Test CSS */" > static/css/styles.css
+    # Run tests
     - python -m unittest discover -s . -p "test_*.py"
 
 # Build the application
