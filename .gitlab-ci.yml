@@ -21,6 +21,7 @@ dependency_scanning:
 stages:
   - test
   - build
+  - publish
   - sast
 
 # Basic Python testing
@@ -43,6 +44,18 @@ build:
   artifacts:
     paths:
       - dist/
+
+# Publish Mapbox package to GitLab registry
+publish-package:
+  stage: publish
+  image: node:16
+  script:
+    - cd .gitlab/packages/
+    - echo "//gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" > .npmrc
+    - npm publish
+  only:
+    - main
+    - feature/map-visualization
 
 # The SAST job is included from the template
 # Configuration to make sure vulnerabilities are detected
