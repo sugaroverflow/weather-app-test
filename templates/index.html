@@ -7,6 +7,8 @@
     <title>Weather Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src='/static/vendor/mapbox-gl/mapbox-gl.js'></script>
+    <link href='/static/vendor/mapbox-gl/mapbox-gl.css' rel='stylesheet' />
     <script>
         tailwind.config = {
             theme: {
@@ -67,6 +69,228 @@
             bottom: 0;
             width: 3px;
             background: linear-gradient(to bottom, #fc6d26, #fd8f4d);
+        }
+
+        /* Map styles */
+        #weather-map {
+            width: 100%;
+            height: 500px;
+            border-radius: 0.5rem;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Map container styles */
+        .map-container {
+            width: 100%;
+            overflow: hidden;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .mapboxgl-popup {
+            max-width: 300px;
+        }
+
+        .mapboxgl-popup-content {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: none;
+        }
+
+        /* Make map container responsive */
+        @media (max-width: 768px) {
+            #weather-map {
+                height: 400px;
+            }
+        }
+
+        /* Improve popup arrow appearance */
+        .mapboxgl-popup-tip {
+            border-top-color: white !important;
+            border-bottom-color: white !important;
+        }
+
+        .weather-popup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .weather-popup img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .weather-popup .temperature {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #6e49cb;
+        }
+
+        .weather-popup .description {
+            color: #666;
+            text-transform: capitalize;
+        }
+
+        /* Weather info overlay */
+        .weather-info-overlay {
+            margin-top: -80px;
+        }
+
+        .weather-info-card {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .weather-info-card .weather-icon {
+            width: 40px;
+            height: 40px;
+            margin-bottom: -10px;
+        }
+
+        .weather-info-card .temperature {
+            font-size: 24px;
+            font-weight: 600;
+            color: #6e49cb;
+        }
+
+        .weather-info-card .city-name {
+            font-size: 14px;
+            color: #555;
+            margin-top: 2px;
+        }
+
+        /* City marker */
+        .city-marker {
+            transition: transform 0.3s ease;
+        }
+
+        .city-marker:hover {
+            transform: scale(1.5);
+        }
+
+        /* City label styles */
+        .city-label {
+            color: #333;
+            font-size: 11px;
+            font-weight: 600;
+            text-shadow: 0 0 4px white, 0 0 4px white, 0 0 4px white, 0 0 4px white;
+            white-space: nowrap;
+            pointer-events: auto;
+        }
+
+        /* Nearby city popup styles */
+        .nearby-city-popup {
+            padding: 5px;
+        }
+
+        .city-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .city-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .city-temp {
+            font-weight: 700;
+            font-size: 16px;
+            color: #6e49cb;
+        }
+
+        .city-weather-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .city-weather-info .weather-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 8px;
+        }
+
+        .weather-details {
+            flex: 1;
+        }
+
+        .weather-desc {
+            color: #555;
+            font-size: 12px;
+            text-transform: capitalize;
+            margin-bottom: 4px;
+        }
+
+        .weather-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .weather-stats i {
+            margin-right: 3px;
+            color: #6e49cb;
+        }
+
+        /* Layer control buttons */
+        .weather-layer-btn {
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            color: #4a5568;
+        }
+
+        .weather-layer-btn:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .weather-layer-btn.active {
+            background: #6e49cb;
+            color: white;
+            border-color: #5843af;
+            box-shadow: 0 2px 5px rgba(110, 73, 203, 0.3);
+        }
+
+        .layer-controls {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+        }
+
+        .layer-controls::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .layer-controls::-webkit-scrollbar-thumb {
+            background-color: rgba(110, 73, 203, 0.3);
+            border-radius: 4px;
+        }
+
+        @media (max-width: 640px) {
+            .weather-layer-btn {
+                padding: 3px 8px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -259,6 +483,32 @@
                         <!-- Forecast cards will be inserted here by JavaScript -->
                     </div>
                 </div>
+
+                <!-- Weather Map Section -->
+                <div class="bg-white m-6 rounded-lg border border-gray-100 shadow-sm accent-line-left">
+                    <h3
+                        class="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-primary-dark to-primary m-4 flex items-center">
+                        <i class="fas fa-map-marked-alt mr-2 text-primary"></i> Weather Map
+                    </h3>
+                    <!-- Weather layer controls -->
+                    <div class="px-4 pb-2 flex items-center gap-2 layer-controls">
+                        <span class="text-sm text-gray-600">Layers:</span>
+                        <button id="precipitation-layer" class="weather-layer-btn active" data-layer="precipitation">
+                            <i class="fas fa-cloud-rain text-blue-500 mr-1"></i> Precipitation
+                        </button>
+                        <button id="temperature-layer" class="weather-layer-btn" data-layer="temperature">
+                            <i class="fas fa-temperature-high text-orange-500 mr-1"></i> Temperature
+                        </button>
+                        <button id="air-quality-layer" class="weather-layer-btn" data-layer="air-quality">
+                            <i class="fas fa-lungs text-green-500 mr-1"></i> Air Quality
+                        </button>
+                    </div>
+                    <!-- Hidden input for Mapbox token -->
+                    <input type="hidden" id="mapbox-token" value="{{ mapbox_token }}">
+                    <div class="map-container">
+                        <div id="weather-map"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -284,6 +534,11 @@
     </footer>
 
     <script src="static/js/weather.js"></script>
+    <script>
+        // Pass the OpenWeather API key to JavaScript
+        window.OPENWEATHER_API_KEY = "{{ openweather_api_key }}";
+    </script>
+    <script src="static/js/map.js"></script>
 </body>
 
 </html>

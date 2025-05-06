@@ -21,6 +21,7 @@ dependency_scanning:
 stages:
   - test
   - build
+  - publish
   - sast
 
 # Basic Python testing
@@ -29,6 +30,10 @@ python-test:
   image: python:3.9
   script:
     - pip install -r requirements.txt
+    # Ensure static directories exist for tests
+    - mkdir -p static/css static/js static/vendor/mapbox-gl
+    - echo "/* Test CSS */" > static/css/styles.css
+    # Run tests
     - python -m unittest discover -s . -p "test_*.py"
 
 # Build the application
@@ -39,10 +44,45 @@ build:
     - pip install -r requirements.txt
     - echo "Building application..."
     - mkdir -p dist/
-    - cp -r *.py templates/ requirements.txt dist/
+    - cp -r *.py templates/ static/ requirements.txt dist/
   artifacts:
     paths:
       - dist/
+
+# Publish Mapbox package to GitLab registry
+publish-package:
+  stage: publish
+  image: node:16
+  script:
+    # Create a local package that follows npm format
+    - echo "Creating package structure..."
+    - mkdir -p package-build/static/vendor/mapbox-gl
+    - cp static/vendor/mapbox-gl/mapbox-gl.js package-build/static/vendor/mapbox-gl/
+    - cp static/vendor/mapbox-gl/mapbox-gl.css package-build/static/vendor/mapbox-gl/
+    - cp .gitlab/packages/package.json package-build/
+    
+    # Add unique build version to avoid version conflicts
+    - cd package-build
+    - mv package.json package.json.orig
+    - |
+      BUILD_NUMBER=${CI_PIPELINE_ID:-$(date +%s)}
+      cat package.json.orig | sed "s/\"version\": \".*\"/\"version\": \"2.15.1-${BUILD_NUMBER}\"/" > package.json
+      rm package.json.orig
+    - cat package.json
+    
+    # Set up npm credentials for GitLab registry
+    - echo "//gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" > .npmrc
+    - echo "@weather-app:registry=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" >> .npmrc
+    
+    # Inspect environment
+    - env | grep CI_
+    - cat .npmrc
+    
+    # Publish to GitLab registry
+    - npm publish
+  only:
+    - main
+    - feature/map-visualization
 
 # The SAST job is included from the template
 # Configuration to make sure vulnerabilities are detected

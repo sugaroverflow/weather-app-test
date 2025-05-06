@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import json
 import os
+import shutil
 
 # Set up environment variable before importing app
 os.environ['OPENWEATHER_API_KEY'] = 'test_api_key'
@@ -16,9 +17,16 @@ class WeatherAppTests(unittest.TestCase):
         """Set up test client before each test."""
         self.app = app.test_client()
         self.app.testing = True
+        
+        # Create test directories if they don't exist
+        os.makedirs('static/css', exist_ok=True)
+        # Create a test CSS file
+        with open('static/css/styles.css', 'w') as f:
+            f.write('/* Test CSS */')
 
     def tearDown(self):
         """Clean up after each test."""
+        # No need to delete the file, it will be overwritten in the next test
         pass
 
     def test_health_check(self):
@@ -64,9 +72,16 @@ class WeatherAppTests(unittest.TestCase):
     @patch('app.requests.get')
     def test_weather_endpoint_success(self, mock_get):
         """Test that the weather endpoint returns formatted data."""
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
+        # Mock responses for both the geocoding and weather requests
+        mock_geo_response = MagicMock()
+        mock_geo_response.status_code = 200
+        mock_geo_response.json.return_value = [
+            {'name': 'London', 'lat': 51.5074, 'lon': -0.1278}
+        ]
+        
+        mock_weather_response = MagicMock()
+        mock_weather_response.status_code = 200
+        mock_weather_response.json.return_value = {
             'name': 'London',
             'sys': {'country': 'GB'},
             'main': {
@@ -81,7 +96,16 @@ class WeatherAppTests(unittest.TestCase):
             'weather': [{'main': 'Clouds', 'description': 'scattered clouds', 'icon': '03d'}],
             'dt': 1649312400
         }
-        mock_get.return_value = mock_response
+        
+        # Set up the mock to return different responses based on the URL
+        def get_side_effect(url, **kwargs):
+            if 'geo/1.0/direct' in url:
+                return mock_geo_response
+            elif 'data/2.5/weather' in url:
+                return mock_weather_response
+            return None
+            
+        mock_get.side_effect = get_side_effect
 
         response = self.app.get('/api/weather?city=London')
         data = json.loads(response.data)
@@ -96,16 +120,19 @@ class WeatherAppTests(unittest.TestCase):
 
     @patch('app.requests.get')
     def test_weather_endpoint_city_not_found(self, mock_get):
-        mock_response = MagicMock()
-        mock_response.status_code = 404
-        mock_response.json.return_value = {'message': 'city not found'}
-        mock_get.return_value = mock_response
+        """Test that the endpoint returns 404 when city is not found."""
+        # Mock the geocoding response to return an empty array (city not found)
+        mock_geo_response = MagicMock()
+        mock_geo_response.status_code = 200
+        mock_geo_response.json.return_value = []
+        
+        mock_get.return_value = mock_geo_response
 
         response = self.app.get('/api/weather?city=NonExistentCity')
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(data['error'], 'city not found')
+        self.assertEqual(data['error'], 'Location not found')
 
     @patch('app.requests.get')
     def test_weather_endpoint_network_error(self, mock_get):

@@ -16,6 +16,7 @@ app = Flask(__name__)
 
 # Get API key from environment variables
 OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY")
+
 if not OPENWEATHER_API_KEY:
     # For demo purposes, we'll set a placeholder
     OPENWEATHER_API_KEY = "your_api_key_here"
@@ -186,7 +187,7 @@ def index():
     Returns:
         rendered template: The main index.html template
     """
-    return render_template("index.html")
+    return render_template("index.html", openweather_api_key=OPENWEATHER_API_KEY)
 
 
 # Route to serve static files
@@ -228,8 +229,29 @@ def get_weather():
         return jsonify({"error": error_message}), 400
 
     try:
-        # Construct URL for OpenWeatherMap API
-        weather_url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+        # First, get coordinates for the city
+        geo_url = f"https://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={OPENWEATHER_API_KEY}"
+
+        # Validate geo URL before making request
+        if not _is_valid_url(geo_url):
+            return jsonify({"error": "Invalid geocoding request URL"}), 400
+
+        geo_response = requests.get(geo_url, timeout=10)
+        geo_data = geo_response.json()
+
+        # Check if location was found
+        if not geo_data:
+            return jsonify({"error": "Location not found"}), 404
+
+        # Extract coordinates with proper error checking
+        try:
+            lat = geo_data[0]["lat"]
+            lon = geo_data[0]["lon"]
+        except (IndexError, KeyError) as e:
+            return jsonify({"error": "Could not extract location coordinates"}), 500
+
+        # Construct URL for OpenWeatherMap API using coordinates
+        weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric"
 
         # Validate URL before making request
         if not _is_valid_url(weather_url):
@@ -256,6 +278,10 @@ def get_weather():
         formatted_response = {
             "city": weather_data["name"],
             "country": weather_data["sys"]["country"],
+            "coordinates": {
+                "lat": lat,
+                "lon": lon
+            },
             "temperature": {
                 "current": weather_data["main"]["temp"],
                 "feels_like": weather_data["main"]["feels_like"],
