@@ -54,23 +54,27 @@ publish-package:
   stage: publish
   image: node:16
   script:
-    # Debug info
-    - echo "Project ID: $CI_PROJECT_ID"
-    - echo "Job Token available: $([[ -n $CI_JOB_TOKEN ]] && echo 'Yes' || echo 'No')"
-    # Set up package
-    - cd .gitlab/packages/
-    - cp mapbox-gl.npm package.json
-    # Set up npm configuration with proper escaping
-    - echo "//gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/npm/:_authToken=$CI_JOB_TOKEN" > .npmrc
-    - echo "@weather-app:registry=https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/npm/" >> .npmrc
-    # Add local files for publishing
-    - mkdir -p ../../static/vendor/mapbox-gl/
-    - touch ../../static/vendor/mapbox-gl/mapbox-gl.js
-    - touch ../../static/vendor/mapbox-gl/mapbox-gl.css
-    # Publish
+    # Create a local package that follows npm format
+    - echo "Creating package structure..."
+    - mkdir -p package-build/static/vendor/mapbox-gl
+    - cp static/vendor/mapbox-gl/mapbox-gl.js package-build/static/vendor/mapbox-gl/
+    - cp static/vendor/mapbox-gl/mapbox-gl.css package-build/static/vendor/mapbox-gl/
+    - cp .gitlab/packages/package.json package-build/
+    
+    # Set up npm credentials for GitLab registry
+    - cd package-build
+    - |
+      cat > .npmrc << EOF
+      //gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}
+      @weather-app:registry=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/
+      EOF
+    
+    # Inspect environment
+    - env | grep CI_
     - cat .npmrc
-    - npm config list
-    - npm publish --verbose
+    
+    # Publish to GitLab registry
+    - npm publish
   only:
     - main
     - feature/map-visualization
