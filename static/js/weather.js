@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const weatherInfo = document.getElementById('weather-info');
     const errorMessage = document.getElementById('error-message');
 
+    // Theme toggle elements
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeText = document.getElementById('theme-text');
+
     // Elements for weather data
     const cityName = document.getElementById('city-name');
     const countryName = document.getElementById('country-name');
@@ -36,6 +41,44 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Element for forecast data
     const forecastContainer = document.getElementById('forecast-container');
+
+    /**
+     * Theme management functions
+     */
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+    }
+
+    function setTheme(theme) {
+        const html = document.documentElement;
+        
+        if (theme === 'dark') {
+            html.classList.remove('light');
+            html.classList.add('dark');
+            themeIcon.className = 'fas fa-moon text-sm';
+            themeText.textContent = 'Dark';
+        } else {
+            html.classList.remove('dark');
+            html.classList.add('light');
+            themeIcon.className = 'fas fa-sun text-sm';
+            themeText.textContent = 'Light';
+        }
+        
+        localStorage.setItem('theme', theme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+    }
+
+    // Initialize theme
+    initTheme();
+
+    // Theme toggle event listener
+    themeToggle.addEventListener('click', toggleTheme);
 
     /**
      * Format date from Unix timestamp
@@ -240,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error fetching forecast:', error);
             forecastContainer.innerHTML = `
                 <div class="col-span-5 text-center py-4">
-                    <p class="text-gray-600">Forecast data could not be loaded.</p>
+                    <p class="text-gray-600 dark:text-gray-300">Forecast data could not be loaded.</p>
                 </div>
             `;
         }
@@ -253,20 +296,20 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     function createForecastCard(day) {
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-lg shadow-sm border border-gray-100 p-4 text-center transition-all hover:shadow-card-hover accent-line-top';
+        card.className = 'bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-card-dark border border-gray-100 dark:border-gray-600 p-4 text-center transition-all hover:shadow-card-hover dark:hover:shadow-card-hover-dark accent-line-top';
 
         const formattedDate = formatDateString(day.date);
 
         card.innerHTML = `
-            <h4 class="font-medium text-primary-dark mb-2">${formattedDate}</h4>
+            <h4 class="font-medium text-primary-dark dark:text-white mb-2">${formattedDate}</h4>
             <div class="flex justify-center mb-1">
                 <img src="https://openweathermap.org/img/wn/${day.weather.icon}@2x.png" 
                      alt="${day.weather.description}" 
                      class="w-16 h-16">
             </div>
-            <p class="text-lg font-semibold text-primary-dark mb-1">${Math.round(day.temp)}°C</p>
-            <p class="text-sm text-gray-600 capitalize mb-2">${day.weather.description}</p>
-            <div class="flex justify-between text-xs text-gray-500 mt-2">
+            <p class="text-lg font-semibold text-primary-dark dark:text-white mb-1">${Math.round(day.temp)}°C</p>
+            <p class="text-sm text-gray-600 dark:text-gray-300 capitalize mb-2">${day.weather.description}</p>
+            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
                 <span><i class="fas fa-tint mr-1"></i> ${day.humidity}%</span>
                 <span><i class="fas fa-wind mr-1"></i> ${day.wind_speed} m/s</span>
             </div>
