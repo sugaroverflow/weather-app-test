@@ -139,7 +139,7 @@ Note there is [a decoupled version of this application with a more complex archi
 - Add a dark mode for theme switching
 
 ### Enhancements
-- Add a caching startegy for API calls
+- Add a caching strategy for API calls
 - Deploy the site via CI/CD to AWS or GCP
 - Add analytics to track performance.
 - Add support for multiple languages
